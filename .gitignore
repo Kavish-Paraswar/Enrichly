@@ -1,0 +1,17 @@
+node_modules/
+.next/
+dist/
+out/
+coverage/
+*.log
+
+backend/**/bin/
+backend/**/obj/
+tests/**/bin/
+tests/**/obj/
+
+.env
+.env.local
+.env.*.local
+
+docker-data/

@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAutomationPlatform.Domain", "src\JobAutomationPlatform.Domain\JobAutomationPlatform.Domain.csproj", "{A8C8B47C-6D55-4D71-9C6F-0A9E0A2D56DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAutomationPlatform.Application", "src\JobAutomationPlatform.Application\JobAutomationPlatform.Application.csproj", "{02A4AB3A-74E8-4D5C-8E5A-8B50B5F0A9B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAutomationPlatform.Infrastructure", "src\JobAutomationPlatform.Infrastructure\JobAutomationPlatform.Infrastructure.csproj", "{4B6E5A6C-BEBC-4FD4-A01A-AB7B57434C0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAutomationPlatform.Api", "src\JobAutomationPlatform.Api\JobAutomationPlatform.Api.csproj", "{F2A9D60A-7C3D-48AE-9C3C-2F0E92A6D4D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAutomationPlatform.Worker", "src\JobAutomationPlatform.Worker\JobAutomationPlatform.Worker.csproj", "{95D4A16F-8B59-4B05-8D5C-72F02E2727B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobAutomationPlatform.Tests", "..\tests\JobAutomationPlatform.Tests\JobAutomationPlatform.Tests.csproj", "{0F0D9A46-71A9-410C-9D5B-3BAA3C1D3E04}"
+EndProject
+Global
+    GlobalSection(SolutionConfigurationPlatforms) = preSolution
+        Debug|Any CPU = Debug|Any CPU
+        Release|Any CPU = Release|Any CPU
+    EndGlobalSection
+    GlobalSection(ProjectConfigurationPlatforms) = postSolution
+        {A8C8B47C-6D55-4D71-9C6F-0A9E0A2D56DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {A8C8B47C-6D55-4D71-9C6F-0A9E0A2D56DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {A8C8B47C-6D55-4D71-9C6F-0A9E0A2D56DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {A8C8B47C-6D55-4D71-9C6F-0A9E0A2D56DB}.Release|Any CPU.Build.0 = Release|Any CPU
+        {02A4AB3A-74E8-4D5C-8E5A-8B50B5F0A9B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {02A4AB3A-74E8-4D5C-8E5A-8B50B5F0A9B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {02A4AB3A-74E8-4D5C-8E5A-8B50B5F0A9B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {02A4AB3A-74E8-4D5C-8E5A-8B50B5F0A9B7}.Release|Any CPU.Build.0 = Release|Any CPU
+        {4B6E5A6C-BEBC-4FD4-A01A-AB7B57434C0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {4B6E5A6C-BEBC-4FD4-A01A-AB7B57434C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {4B6E5A6C-BEBC-4FD4-A01A-AB7B57434C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {4B6E5A6C-BEBC-4FD4-A01A-AB7B57434C0E}.Release|Any CPU.Build.0 = Release|Any CPU
+        {F2A9D60A-7C3D-48AE-9C3C-2F0E92A6D4D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {F2A9D60A-7C3D-48AE-9C3C-2F0E92A6D4D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {F2A9D60A-7C3D-48AE-9C3C-2F0E92A6D4D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {F2A9D60A-7C3D-48AE-9C3C-2F0E92A6D4D8}.Release|Any CPU.Build.0 = Release|Any CPU
+        {95D4A16F-8B59-4B05-8D5C-72F02E2727B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {95D4A16F-8B59-4B05-8D5C-72F02E2727B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {95D4A16F-8B59-4B05-8D5C-72F02E2727B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {95D4A16F-8B59-4B05-8D5C-72F02E2727B7}.Release|Any CPU.Build.0 = Release|Any CPU
+        {0F0D9A46-71A9-410C-9D5B-3BAA3C1D3E04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+        {0F0D9A46-71A9-410C-9D5B-3BAA3C1D3E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+        {0F0D9A46-71A9-410C-9D5B-3BAA3C1D3E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+        {0F0D9A46-71A9-410C-9D5B-3BAA3C1D3E04}.Release|Any CPU.Build.0 = Release|Any CPU
+    EndGlobalSection
+EndGlobal

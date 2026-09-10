@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>JobAutomationPlatform.Worker</AssemblyName>
+    <RootNamespace>JobAutomationPlatform.Worker</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JobAutomationPlatform.Application\JobAutomationPlatform.Application.csproj" />
+    <ProjectReference Include="..\JobAutomationPlatform.Infrastructure\JobAutomationPlatform.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

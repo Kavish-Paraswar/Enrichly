@@ -1,0 +1,1 @@
+namespace JobAutomationPlatform.Infrastructure.Persistence;
