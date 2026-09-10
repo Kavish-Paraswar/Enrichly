@@ -16,7 +16,13 @@ public sealed class UpdateJobRequest
     [Required, MaxLength(16)]
     public string HttpMethod { get; init; } = "POST";
 
+    [MaxLength(4000)]
+    public string? RequestHeadersJson { get; init; }
+
     public string? PayloadJson { get; init; }
+
+    [Range(1, 600)]
+    public int TimeoutSeconds { get; init; } = 30;
 
     [Range(1, 10080)]
     public int? ScheduleEveryMinutes { get; init; }

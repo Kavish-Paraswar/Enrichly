@@ -2,6 +2,7 @@ using JobAutomationPlatform.Application.Common;
 using JobAutomationPlatform.Application.Interfaces;
 using JobAutomationPlatform.Domain.Entities;
 using JobAutomationPlatform.Domain.Enums;
+using JobAutomationPlatform.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobAutomationPlatform.Infrastructure.Services;
@@ -42,7 +43,7 @@ public sealed class JobSchedulerService : IJobSchedulerService
         foreach (var job in dueJobs)
         {
             var hasActiveRequest = await _dbContext.ExecutionRequests
-                .AnyAsync(x => x.JobId == job.Id && x.CompletedAtUtc == null, cancellationToken);
+                .AnyAsync(x => x.JobId == job.Id && x.OwnerUserId == job.OwnerUserId && x.CompletedAtUtc == null, cancellationToken);
 
             if (hasActiveRequest)
             {
@@ -52,12 +53,14 @@ public sealed class JobSchedulerService : IJobSchedulerService
             var request = new ExecutionRequest
             {
                 Id = Guid.NewGuid(),
+                OwnerUserId = job.OwnerUserId,
                 JobId = job.Id,
                 Source = ExecutionRequestSource.Schedule,
                 Status = ExecutionRequestStatus.Queued,
                 RetryCount = 0,
                 RequestedAtUtc = utcNow,
                 ReadyAtUtc = utcNow,
+                IdempotencyKey = null,
                 CreatedAtUtc = utcNow,
                 UpdatedAtUtc = utcNow,
             };

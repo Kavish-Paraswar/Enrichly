@@ -6,9 +6,11 @@ public interface IExecutionService
 {
     Task<IReadOnlyList<ExecutionSummaryDto>> ListByJobAsync(Guid jobId, CancellationToken cancellationToken);
 
+    Task<IReadOnlyList<ExecutionSummaryDto>> ListAsync(CancellationToken cancellationToken);
+
     Task<ExecutionDetailDto?> GetAsync(Guid id, CancellationToken cancellationToken);
 
-    Task<ExecutionDetailDto> RunNowAsync(Guid jobId, CancellationToken cancellationToken);
+    Task<ExecutionDetailDto> RunNowAsync(Guid jobId, string? idempotencyKey, CancellationToken cancellationToken);
 
     Task<ExecutionDetailDto> RetryAsync(Guid executionRequestId, CancellationToken cancellationToken);
 }

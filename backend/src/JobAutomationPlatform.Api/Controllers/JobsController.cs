@@ -1,10 +1,12 @@
 using JobAutomationPlatform.Application.Dto;
 using JobAutomationPlatform.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobAutomationPlatform.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/jobs")]
 public sealed class JobsController : ControllerBase
 {
@@ -16,9 +18,9 @@ public sealed class JobsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IReadOnlyList<JobSummaryDto>>> List(CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyList<JobSummaryDto>>> List([FromQuery] string? search, [FromQuery] bool? isEnabled, CancellationToken cancellationToken)
     {
-        return Ok(await _jobService.ListAsync(cancellationToken));
+        return Ok(await _jobService.ListAsync(search, isEnabled, cancellationToken));
     }
 
     [HttpGet("{id:guid}")]
@@ -51,5 +53,12 @@ public sealed class JobsController : ControllerBase
     public async Task<ActionResult<JobDetailDto>> Disable(Guid id, CancellationToken cancellationToken)
     {
         return Ok(await _jobService.SetEnabledAsync(id, false, cancellationToken));
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        await _jobService.DeleteAsync(id, cancellationToken);
+        return NoContent();
     }
 }

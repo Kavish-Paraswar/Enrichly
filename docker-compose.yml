@@ -25,6 +25,11 @@ services:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__Default: ${ConnectionStrings__Default:-Host=postgres;Port=5432;Database=job_automation;Username=job_automation;Password=job_automation_dev}
+      Jwt__Issuer: ${Jwt__Issuer:-Enrichly}
+      Jwt__Audience: ${Jwt__Audience:-Enrichly}
+      Jwt__SigningKey: ${Jwt__SigningKey:-replace-with-a-long-random-secret-at-least-32-chars}
+      Jwt__TokenMinutes: ${Jwt__TokenMinutes:-720}
+      Session__SessionDays: ${Session__SessionDays:-7}
     ports:
       - "8080:8080"
     depends_on:
@@ -39,6 +44,11 @@ services:
     environment:
       ConnectionStrings__Default: ${ConnectionStrings__Default:-Host=postgres;Port=5432;Database=job_automation;Username=job_automation;Password=job_automation_dev}
       Worker__PollingIntervalSeconds: ${Worker__PollingIntervalSeconds:-5}
+      Worker__HeartbeatIntervalSeconds: ${Worker__HeartbeatIntervalSeconds:-5}
+      Worker__StaleAfterMinutes: ${Worker__StaleAfterMinutes:-2}
+      Worker__RetryBaseDelaySeconds: ${Worker__RetryBaseDelaySeconds:-30}
+      Worker__RetryMaxDelaySeconds: ${Worker__RetryMaxDelaySeconds:-600}
+      Worker__SchedulerIntervalSeconds: ${Worker__SchedulerIntervalSeconds:-15}
     depends_on:
       postgres:
         condition: service_healthy

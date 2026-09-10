@@ -16,5 +16,9 @@ public sealed class ExecutionAttemptConfiguration : IEntityTypeConfiguration<Exe
         builder.Property(x => x.UpdatedAtUtc).IsRequired();
         builder.Property(x => x.ErrorSummary).HasMaxLength(2000);
         builder.Property(x => x.WorkerName).HasMaxLength(200);
+        builder.Property(x => x.WorkerInstanceId).HasMaxLength(100);
+        builder.Property(x => x.ResponseHeadersJson).HasColumnType("jsonb");
+        builder.Property(x => x.ResponseBody).HasColumnType("text");
+        builder.Property(x => x.ErrorDetailsJson).HasColumnType("jsonb");
     }
 }

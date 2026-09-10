@@ -1,6 +1,7 @@
 using JobAutomationPlatform.Application.Interfaces;
 using JobAutomationPlatform.Domain.Entities;
 using JobAutomationPlatform.Infrastructure.Persistence;
+using JobAutomationPlatform.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -42,6 +43,13 @@ public sealed class ExecutionProcessorBackgroundService : BackgroundService
                 if (job is null)
                 {
                     _logger.LogWarning("Claimed execution {ExecutionRequestId} but job {JobId} no longer exists.", claim.ExecutionRequestId, claim.JobId);
+                    await queueService.CompleteFailedAsync(
+                        claim.ExecutionAttemptId,
+                        DateTimeOffset.UtcNow,
+                        new JobRunResult(false, null, "Job was deleted before execution.", "{\"error\":\"job deleted\"}", null, null, null, null, false),
+                        scheduleRetry: false,
+                        retryAtUtc: null,
+                        stoppingToken);
                     continue;
                 }
 
@@ -74,20 +82,20 @@ public sealed class ExecutionProcessorBackgroundService : BackgroundService
 
         try
         {
-            var result = await jobRunner.RunAsync(job, stoppingToken);
+            var result = await jobRunner.RunAsync(job, claim, stoppingToken);
             var completedAtUtc = DateTimeOffset.UtcNow;
 
             if (result.Succeeded)
             {
-                await queueService.CompleteSucceededAsync(claim.ExecutionAttemptId, completedAtUtc, result.Output, stoppingToken);
+                await queueService.CompleteSucceededAsync(claim.ExecutionAttemptId, completedAtUtc, result, stoppingToken);
                 return;
             }
 
-            var retryAtUtc = completedAtUtc.AddSeconds(_options.RetryDelaySeconds);
+            var retryAtUtc = completedAtUtc.Add(RetryMath.GetRetryDelay(claim.AttemptNumber, TimeSpan.FromSeconds(_options.RetryBaseDelaySeconds), TimeSpan.FromSeconds(_options.RetryMaxDelaySeconds)));
             await queueService.CompleteFailedAsync(
                 claim.ExecutionAttemptId,
                 completedAtUtc,
-                result.FailureSummary ?? "Job execution failed.",
+                result,
                 scheduleRetry: claim.AttemptNumber < claim.MaxAttempts,
                 retryAtUtc: retryAtUtc,
                 cancellationToken: stoppingToken);

@@ -7,6 +7,10 @@ public sealed class ExecutionRequest
 {
     public Guid Id { get; set; }
 
+    public Guid OwnerUserId { get; set; }
+
+    public User? OwnerUser { get; set; }
+
     public Guid JobId { get; set; }
 
     public Job? Job { get; set; }
@@ -21,12 +25,19 @@ public sealed class ExecutionRequest
 
     public DateTimeOffset ReadyAtUtc { get; set; }
 
+    public DateTimeOffset? RetryAtUtc { get; set; }
+
+    [MaxLength(100)]
+    public string? IdempotencyKey { get; set; }
+
     public DateTimeOffset? StartedAtUtc { get; set; }
 
     public DateTimeOffset? CompletedAtUtc { get; set; }
 
     [MaxLength(2000)]
     public string? LastErrorSummary { get; set; }
+
+    public string? LastErrorDetailsJson { get; set; }
 
     public DateTimeOffset CreatedAtUtc { get; set; }
 

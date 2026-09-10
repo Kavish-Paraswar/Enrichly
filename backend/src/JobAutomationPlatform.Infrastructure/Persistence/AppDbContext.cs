@@ -13,6 +13,10 @@ public sealed class AppDbContext : DbContext
 
     public DbSet<Job> Jobs => Set<Job>();
 
+    public DbSet<User> Users => Set<User>();
+
+    public DbSet<SessionToken> SessionTokens => Set<SessionToken>();
+
     public DbSet<ExecutionRequest> ExecutionRequests => Set<ExecutionRequest>();
 
     public DbSet<ExecutionAttempt> ExecutionAttempts => Set<ExecutionAttempt>();

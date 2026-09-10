@@ -4,7 +4,7 @@ namespace JobAutomationPlatform.Application.Interfaces;
 
 public interface IJobService
 {
-    Task<IReadOnlyList<JobSummaryDto>> ListAsync(CancellationToken cancellationToken);
+    Task<IReadOnlyList<JobSummaryDto>> ListAsync(string? search, bool? isEnabled, CancellationToken cancellationToken);
 
     Task<JobDetailDto?> GetAsync(Guid id, CancellationToken cancellationToken);
 
@@ -13,4 +13,6 @@ public interface IJobService
     Task<JobDetailDto> UpdateAsync(Guid id, UpdateJobRequest request, CancellationToken cancellationToken);
 
     Task<JobDetailDto> SetEnabledAsync(Guid id, bool isEnabled, CancellationToken cancellationToken);
+
+    Task DeleteAsync(Guid id, CancellationToken cancellationToken);
 }

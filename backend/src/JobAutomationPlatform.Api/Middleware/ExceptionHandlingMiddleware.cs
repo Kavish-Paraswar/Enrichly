@@ -34,6 +34,10 @@ public sealed class ExceptionHandlingMiddleware
         {
             await WriteProblemAsync(context, HttpStatusCode.BadRequest, ex.Message);
         }
+        catch (UnauthorizedException ex)
+        {
+            await WriteProblemAsync(context, HttpStatusCode.Unauthorized, ex.Message);
+        }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.LogWarning(ex, "Concurrency conflict detected.");

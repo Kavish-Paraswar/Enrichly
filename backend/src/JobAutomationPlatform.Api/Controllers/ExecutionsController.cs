@@ -1,10 +1,12 @@
 using JobAutomationPlatform.Application.Dto;
 using JobAutomationPlatform.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JobAutomationPlatform.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api")]
 public sealed class ExecutionsController : ControllerBase
 {
@@ -22,9 +24,9 @@ public sealed class ExecutionsController : ControllerBase
     }
 
     [HttpPost("jobs/{jobId:guid}/run")]
-    public async Task<ActionResult<ExecutionDetailDto>> RunNow(Guid jobId, CancellationToken cancellationToken)
+    public async Task<ActionResult<ExecutionDetailDto>> RunNow(Guid jobId, [FromHeader(Name = "Idempotency-Key")] string? idempotencyKey, CancellationToken cancellationToken)
     {
-        var execution = await _executionService.RunNowAsync(jobId, cancellationToken);
+        var execution = await _executionService.RunNowAsync(jobId, idempotencyKey, cancellationToken);
         return CreatedAtAction(nameof(Get), new { id = execution.Id }, execution);
     }
 

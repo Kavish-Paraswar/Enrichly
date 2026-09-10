@@ -6,6 +6,10 @@ public sealed class Job
 {
     public Guid Id { get; set; }
 
+    public Guid OwnerUserId { get; set; }
+
+    public User? OwnerUser { get; set; }
+
     [MaxLength(200)]
     public string Name { get; set; } = string.Empty;
 
@@ -18,7 +22,11 @@ public sealed class Job
     [MaxLength(16)]
     public string HttpMethod { get; set; } = "POST";
 
+    public string? RequestHeadersJson { get; set; }
+
     public string? PayloadJson { get; set; }
+
+    public int TimeoutSeconds { get; set; } = 30;
 
     public bool IsEnabled { get; set; }
 

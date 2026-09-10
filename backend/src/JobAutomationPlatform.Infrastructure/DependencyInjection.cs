@@ -1,6 +1,7 @@
 using JobAutomationPlatform.Application.Common;
 using JobAutomationPlatform.Application.Interfaces;
 using JobAutomationPlatform.Infrastructure.Persistence;
+using JobAutomationPlatform.Infrastructure.Security;
 using JobAutomationPlatform.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,10 +25,12 @@ public static class DependencyInjection
             });
         });
 
+        services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IJobService, JobService>();
         services.AddScoped<IExecutionService, ExecutionService>();
         services.AddScoped<IExecutionQueueService, ExecutionQueueService>();
         services.AddScoped<IJobSchedulerService, JobSchedulerService>();
+        services.AddSingleton<IJwtTokenService, JwtTokenService>();
 
         return services;
     }

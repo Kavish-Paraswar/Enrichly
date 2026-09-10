@@ -2,6 +2,7 @@ using JobAutomationPlatform.Application.Common;
 using JobAutomationPlatform.Application.Interfaces;
 using JobAutomationPlatform.Domain.Entities;
 using JobAutomationPlatform.Domain.Enums;
+using JobAutomationPlatform.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobAutomationPlatform.Infrastructure.Services;
@@ -51,6 +52,7 @@ public sealed class ExecutionQueueService : IExecutionQueueService
             AttemptNumber = attemptNumber,
             Status = ExecutionAttemptStatus.Running,
             WorkerName = workerName,
+            WorkerInstanceId = Environment.MachineName,
             StartedAtUtc = utcNow,
             HeartbeatAtUtc = utcNow,
             CreatedAtUtc = utcNow,
@@ -68,13 +70,17 @@ public sealed class ExecutionQueueService : IExecutionQueueService
         return new QueuedExecutionClaim(
             request.Id,
             request.JobId,
+            request.OwnerUserId,
             attempt.Id,
             request.Job.Name,
             request.Job.TargetUrl,
             request.Job.HttpMethod,
+            request.Job.RequestHeadersJson,
             request.Job.PayloadJson,
+            request.Job.TimeoutSeconds,
             attemptNumber,
-            request.Job.MaxAttempts);
+            request.Job.MaxAttempts,
+            request.IdempotencyKey);
     }
 
     public async Task UpdateHeartbeatAsync(Guid executionAttemptId, DateTimeOffset heartbeatAtUtc, CancellationToken cancellationToken)
@@ -87,7 +93,7 @@ public sealed class ExecutionQueueService : IExecutionQueueService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task CompleteSucceededAsync(Guid executionAttemptId, DateTimeOffset completedAtUtc, string? output, CancellationToken cancellationToken)
+    public async Task CompleteSucceededAsync(Guid executionAttemptId, DateTimeOffset completedAtUtc, JobRunResult result, CancellationToken cancellationToken)
     {
         var attempt = await _dbContext.ExecutionAttempts
             .Include(x => x.ExecutionRequest)
@@ -99,21 +105,24 @@ public sealed class ExecutionQueueService : IExecutionQueueService
         attempt.Status = ExecutionAttemptStatus.Succeeded;
         attempt.CompletedAtUtc = completedAtUtc;
         attempt.UpdatedAtUtc = completedAtUtc;
+        attempt.IsTimedOut = false;
+        attempt.HttpStatusCode = result.HttpStatusCode;
+        attempt.DurationMilliseconds = result.DurationMilliseconds;
+        attempt.ResponseHeadersJson = result.ResponseHeadersJson;
+        attempt.ResponseBody = result.ResponseBody;
+        attempt.ErrorSummary = null;
+        attempt.ErrorDetailsJson = null;
 
         request.Status = ExecutionRequestStatus.Succeeded;
         request.CompletedAtUtc = completedAtUtc;
         request.LastErrorSummary = null;
+        request.LastErrorDetailsJson = null;
         request.UpdatedAtUtc = completedAtUtc;
-
-        if (!string.IsNullOrWhiteSpace(output))
-        {
-            request.LastErrorSummary = null;
-        }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task CompleteFailedAsync(Guid executionAttemptId, DateTimeOffset completedAtUtc, string failureSummary, bool scheduleRetry, DateTimeOffset? retryAtUtc, CancellationToken cancellationToken)
+    public async Task CompleteFailedAsync(Guid executionAttemptId, DateTimeOffset completedAtUtc, JobRunResult result, bool scheduleRetry, DateTimeOffset? retryAtUtc, CancellationToken cancellationToken)
     {
         var attempt = await _dbContext.ExecutionAttempts
             .Include(x => x.ExecutionRequest)
@@ -126,17 +135,25 @@ public sealed class ExecutionQueueService : IExecutionQueueService
 
         attempt.Status = ExecutionAttemptStatus.Failed;
         attempt.CompletedAtUtc = completedAtUtc;
-        attempt.ErrorSummary = failureSummary;
+        attempt.ErrorSummary = result.FailureSummary;
+        attempt.ErrorDetailsJson = result.FailureDetailsJson;
+        attempt.HttpStatusCode = result.HttpStatusCode;
+        attempt.DurationMilliseconds = result.DurationMilliseconds;
+        attempt.ResponseHeadersJson = result.ResponseHeadersJson;
+        attempt.ResponseBody = result.ResponseBody;
+        attempt.IsTimedOut = result.IsTimedOut;
         attempt.UpdatedAtUtc = completedAtUtc;
 
-        request.LastErrorSummary = failureSummary;
+        request.LastErrorSummary = result.FailureSummary;
+        request.LastErrorDetailsJson = result.FailureDetailsJson;
         request.UpdatedAtUtc = completedAtUtc;
 
         if (scheduleRetry)
         {
             request.Status = ExecutionRequestStatus.RetryScheduled;
             request.RetryCount += 1;
-            request.ReadyAtUtc = retryAtUtc ?? _clock.UtcNow;
+            request.RetryAtUtc = retryAtUtc ?? _clock.UtcNow;
+            request.ReadyAtUtc = request.RetryAtUtc.Value;
             request.CompletedAtUtc = null;
         }
         else
@@ -235,12 +252,15 @@ public sealed class ExecutionQueueService : IExecutionQueueService
             attempt.Status = ExecutionAttemptStatus.Stale;
             attempt.CompletedAtUtc = staleBeforeUtc;
             attempt.UpdatedAtUtc = staleBeforeUtc;
+            attempt.IsTimedOut = true;
+            attempt.ErrorSummary = "Execution became stale before completing.";
 
             if (request.RetryCount < job.MaxAttempts)
             {
                 request.Status = ExecutionRequestStatus.RetryScheduled;
                 request.RetryCount += 1;
-                request.ReadyAtUtc = staleBeforeUtc;
+                request.RetryAtUtc = staleBeforeUtc.Add(RetryMath.GetRetryDelay(request.RetryCount, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(600)));
+                request.ReadyAtUtc = request.RetryAtUtc.Value;
                 request.CompletedAtUtc = null;
             }
             else
@@ -250,6 +270,7 @@ public sealed class ExecutionQueueService : IExecutionQueueService
             }
 
             request.LastErrorSummary = "Execution became stale before completing.";
+            request.LastErrorDetailsJson = null;
             request.UpdatedAtUtc = staleBeforeUtc;
             reaped += 1;
         }

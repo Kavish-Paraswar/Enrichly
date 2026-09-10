@@ -20,3 +20,10 @@ public sealed class ValidationException : Exception
     {
     }
 }
+
+public sealed class UnauthorizedException : Exception
+{
+    public UnauthorizedException(string message) : base(message)
+    {
+    }
+}
